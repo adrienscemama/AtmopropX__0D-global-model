@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.constants import pi, e, k, epsilon_0 as eps_0, c, m_e
 from scipy.special import jv
+from scipy.optimize import fsolve
 
 SIGMA_I = 1e-18 # Review this for iodine
 
@@ -33,11 +34,14 @@ def A_eff(n_g, R, L):
 def A_eff_1(n_g, R, L, beta_i):
     return 2 * h_R(n_g, R) * pi * R * L + (2 - beta_i) * h_L(n_g, L) * pi * R**2
 
-def eps_p(omega, n_e, n_g, K_el):
-    omega_pe_sq = (n_e * e**2) / (m_e * eps_0)
-    nu_m_i = 1j * K_el * n_g
-    return 1 - (omega_pe_sq / (omega * (omega -  nu_m_i)))
-
+def eps_p(tab_c , tab_eps):
+    """ Cauculates eps_p from the already calculated eps_i and c_i for each ion"""
+    def equation(tab_c , tab_eps , x):
+        sum = 0
+        for i in(range(len(tab_c_i))):
+            sum += tab_c[i](tab_eps[i]-1)/(tab_eps[i] + 2*x))
+        sum += (1-x)/(3*x)
+    return fsolve(equation, 1)
 
 def R_ind(R, L, N, omega, n_e, n_g, K_el):
     ep = eps_p(omega, n_e, n_g, K_el)
